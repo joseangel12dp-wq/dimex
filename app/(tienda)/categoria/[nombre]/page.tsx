@@ -4,6 +4,7 @@ import {
   getCategoriaBySlug,
   getCategoriasConConteo,
   getProductos,
+  getConfiguracion,
   parseOrden,
 } from "@/lib/queries";
 import CatalogoView from "@/components/CatalogoView";
@@ -39,9 +40,10 @@ export default async function CategoriaPage({
   if (!cat) notFound();
 
   const orden = parseOrden(sp.orden);
-  const [productos, categorias] = await Promise.all([
+  const [productos, categorias, config] = await Promise.all([
     getProductos({ categoriaSlug: nombre, orden }),
     getCategoriasConConteo(),
+    getConfiguracion(),
   ]);
   const total = categorias.reduce((n, c) => n + c.count, 0);
 
@@ -53,6 +55,7 @@ export default async function CategoriaPage({
       totalCount={total}
       categoriaActiva={cat.slug}
       orden={orden}
+      mostrarPrecios={config?.mostrar_precios ?? true}
     />
   );
 }

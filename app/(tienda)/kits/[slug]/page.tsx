@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getKitBySlug, getKitSlugs } from "@/lib/queries";
+import { getKitBySlug, getKitSlugs, getConfiguracion } from "@/lib/queries";
 import { money } from "@/lib/format";
 import { waLink } from "@/lib/whatsapp";
 import MediaImagen from "@/components/MediaImagen";
@@ -45,14 +45,15 @@ export default async function KitDetallePage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const kit = await getKitBySlug(slug);
+  const [kit, config] = await Promise.all([getKitBySlug(slug), getConfiguracion()]);
   if (!kit) notFound();
+  const mostrarPrecios = config?.mostrar_precios ?? true;
 
   const waHref = waLink(`Hola DIMEX, me interesa el kit: ${kit.nombre}`);
 
   return (
     <>
-      <JsonLd data={kitProductLd(kit)} />
+      <JsonLd data={kitProductLd(kit, mostrarPrecios)} />
 
       <section className="max-w-[1080px] mx-auto px-4 sm:px-7 pt-[30px] pb-[120px] sm:pb-12">
         {/* Migas de pan */}
@@ -83,11 +84,13 @@ export default async function KitDetallePage({
           <div className="flex flex-col gap-[18px]">
             <h1 className="m-0 text-[32px] font-extrabold tracking-[-.025em]">{kit.nombre}</h1>
 
-            <div className="flex items-baseline gap-3">
-              <span className="tnum text-[34px] font-extrabold text-brand-ink tracking-[-.02em]">
-                {money(kit.precio)}
-              </span>
-            </div>
+            {mostrarPrecios && (
+              <div className="flex items-baseline gap-3">
+                <span className="tnum text-[34px] font-extrabold text-brand-ink tracking-[-.02em]">
+                  {money(kit.precio)}
+                </span>
+              </div>
+            )}
 
             {kit.descripcion && (
               <div className="border border-line rounded-[14px] px-[22px] py-5">
@@ -125,7 +128,9 @@ export default async function KitDetallePage({
       <div className="sm:hidden fixed left-0 right-0 bottom-0 z-[45] bg-white border-t border-line-2 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_24px_-18px_rgba(0,0,0,.4)]">
         <div className="flex flex-col">
           <span className="text-xs text-muted-2 line-clamp-1 max-w-[150px]">{kit.nombre}</span>
-          <span className="tnum text-xl font-extrabold text-brand-ink">{money(kit.precio)}</span>
+          {mostrarPrecios && (
+            <span className="tnum text-xl font-extrabold text-brand-ink">{money(kit.precio)}</span>
+          )}
         </div>
         <AgregarKitButton
           id={kit.id}

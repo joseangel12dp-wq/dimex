@@ -37,6 +37,7 @@ export default async function HomePage() {
   // Primeros kits (combos) para destacar en el inicio.
   const featured = kits.slice(0, 3);
 
+  const mostrarPrecios = config?.mostrar_precios ?? true;
   const heroEyebrow = promo?.titulo ?? "Vuelta a clases";
   const heroTitulo = promo?.subtitulo ?? "Todo lo que escribe tu día, en un solo lugar.";
   const heroHref = promo?.enlace ?? "/kits";
@@ -130,7 +131,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
             {featured.map((kit, i) => (
               <Reveal key={kit.id} delay={i}>
-                <KitCard kit={kit} />
+                <KitCard kit={kit} mostrarPrecios={mostrarPrecios} />
               </Reveal>
             ))}
           </div>
@@ -172,7 +173,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-[22px]">
             {destacados.map((p, i) => (
               <Reveal key={p.id} delay={i}>
-                <ProductCard p={p} />
+                <ProductCard p={p} mostrarPrecios={mostrarPrecios} />
               </Reveal>
             ))}
           </div>
@@ -213,7 +214,7 @@ export default async function HomePage() {
               </div>
               <div className="flex gap-2.5 flex-wrap">
                 <a
-                  href="https://maps.google.com/maps?q=Maracaibo,%20Zulia,%20Venezuela"
+                  href="https://www.google.com/maps/search/?api=1&query=10.680094324205516,-71.60626154338263"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-brand text-white rounded-[10px] px-[18px] py-3 text-sm font-semibold inline-flex items-center gap-2"

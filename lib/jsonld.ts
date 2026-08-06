@@ -30,7 +30,7 @@ export function localBusinessLd(config: Configuracion | null) {
   };
 }
 
-export function kitProductLd(kit: Kit) {
+export function kitProductLd(kit: Kit, mostrarPrecios = true) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -39,18 +39,25 @@ export function kitProductLd(kit: Kit) {
     image: kit.imagen_url ?? undefined,
     url: `${SITE_URL}/kits/${kit.slug}`,
     brand: { "@type": "Brand", name: "DIMEX" },
-    offers: {
-      "@type": "Offer",
-      price: kit.precio.toFixed(2),
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      url: `${SITE_URL}/kits/${kit.slug}`,
-    },
+    // Si los precios están ocultos, no publicamos la oferta con precio.
+    offers: mostrarPrecios
+      ? {
+          "@type": "Offer",
+          price: kit.precio.toFixed(2),
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: `${SITE_URL}/kits/${kit.slug}`,
+        }
+      : undefined,
   };
 }
 
 /** Lista de productos (catálogo o categoría). Emite un Product por ítem. */
-export function productosItemListLd(productos: Producto[], nombreLista: string) {
+export function productosItemListLd(
+  productos: Producto[],
+  nombreLista: string,
+  mostrarPrecios = true
+) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -64,12 +71,14 @@ export function productosItemListLd(productos: Producto[], nombreLista: string) 
         name: p.nombre,
         description: p.descripcion ?? undefined,
         image: p.imagen_url ?? undefined,
-        offers: {
-          "@type": "Offer",
-          price: p.precio.toFixed(2),
-          priceCurrency: "USD",
-          availability: "https://schema.org/InStock",
-        },
+        offers: mostrarPrecios
+          ? {
+              "@type": "Offer",
+              price: p.precio.toFixed(2),
+              priceCurrency: "USD",
+              availability: "https://schema.org/InStock",
+            }
+          : undefined,
       },
     })),
   };

@@ -23,6 +23,7 @@ export default function CatalogoView({
   categoriaActiva,
   orden,
   q,
+  mostrarPrecios = true,
 }: {
   titulo: string;
   productos: Producto[];
@@ -31,6 +32,7 @@ export default function CatalogoView({
   categoriaActiva: string | null;
   orden: OrdenProductos;
   q?: string;
+  mostrarPrecios?: boolean;
 }) {
   const filtros: Filtro[] = [
     { name: "Todos", href: "/catalogo", count: totalCount, active: categoriaActiva === null },
@@ -54,7 +56,9 @@ export default function CatalogoView({
 
   return (
     <section className="max-w-[1280px] mx-auto px-4 sm:px-7 pt-[30px] pb-12">
-      {productos.length > 0 && <JsonLd data={productosItemListLd(productos, titulo)} />}
+      {productos.length > 0 && (
+        <JsonLd data={productosItemListLd(productos, titulo, mostrarPrecios)} />
+      )}
 
       {/* Migas de pan */}
       <nav className="text-sm text-muted-2 mb-4" aria-label="Ruta">
@@ -124,7 +128,7 @@ export default function CatalogoView({
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-[22px]">
               {productos.map((p, i) => (
                 <Reveal key={p.id} delay={i % 6}>
-                  <ProductCard p={p} />
+                  <ProductCard p={p} mostrarPrecios={mostrarPrecios} />
                 </Reveal>
               ))}
             </div>

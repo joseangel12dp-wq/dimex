@@ -24,19 +24,28 @@ export async function actualizarConfiguracion(
     .split(/[\n,]/)
     .map((s) => s.trim())
     .filter(Boolean);
+  const mostrar_precios = formData.get("mostrar_precios") === "on";
 
   if (!whatsapp) return { error: "El número de WhatsApp es obligatorio." };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("configuracion")
-    .update({ whatsapp, direccion, horario, instagram_url, tiktok_url, mapa_embed, metodos_pago })
+    .update({
+      whatsapp,
+      direccion,
+      horario,
+      instagram_url,
+      tiktok_url,
+      mapa_embed,
+      metodos_pago,
+      mostrar_precios,
+    })
     .eq("id", 1);
   if (error) return { error: error.message };
 
-  // Refrescar las partes de la tienda que usan estos datos.
-  revalidatePath("/");
-  revalidatePath("/nosotros");
-  revalidatePath("/admin/configuracion");
+  // El interruptor de precios y los métodos de pago afectan a toda la tienda,
+  // así que revalidamos todo el árbol público (layout).
+  revalidatePath("/", "layout");
   return { ok: true };
 }

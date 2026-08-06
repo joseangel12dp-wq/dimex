@@ -25,7 +25,7 @@ export default function CartDrawer() {
     setPaymentMethod,
     closeCart,
   } = useCart();
-  const { whatsapp, metodosPago } = useSiteConfig();
+  const { whatsapp, metodosPago, mostrarPrecios } = useSiteConfig();
 
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
@@ -55,7 +55,10 @@ export default function CartDrawer() {
 
   const whatsappHref =
     count > 0
-      ? waLink(buildOrderMessage(items, fulfillment, customerName, paymentMethod), whatsapp)
+      ? waLink(
+          buildOrderMessage(items, fulfillment, customerName, paymentMethod, mostrarPrecios),
+          whatsapp
+        )
       : "#";
 
   return (
@@ -163,9 +166,11 @@ export default function CartDrawer() {
                           +
                         </button>
                       </div>
-                      <span className="tnum text-[15px] font-bold text-brand-ink">
-                        {money(l.price * l.qty)}
-                      </span>
+                      {mostrarPrecios && (
+                        <span className="tnum text-[15px] font-bold text-brand-ink">
+                          {money(l.price * l.qty)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -233,12 +238,14 @@ export default function CartDrawer() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-baseline">
-                <span className="text-[15px] text-[#5c646d]">Subtotal</span>
-                <span className="tnum text-[23px] font-extrabold text-ink tracking-[-.02em]">
-                  {money(subtotal)}
-                </span>
-              </div>
+              {mostrarPrecios && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[15px] text-[#5c646d]">Subtotal</span>
+                  <span className="tnum text-[23px] font-extrabold text-ink tracking-[-.02em]">
+                    {money(subtotal)}
+                  </span>
+                </div>
+              )}
 
               <a
                 href={whatsappHref}

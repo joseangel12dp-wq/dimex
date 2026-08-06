@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { NAV } from "@/lib/site";
 import { money } from "@/lib/format";
 import { useCart } from "@/components/cart/CartProvider";
+import { useSiteConfig } from "@/components/ConfigProvider";
 import { CartIcon, SearchIcon, MenuIcon } from "@/components/icons";
 
 /**
@@ -15,6 +16,7 @@ import { CartIcon, SearchIcon, MenuIcon } from "@/components/icons";
  */
 export default function Header() {
   const { count, subtotal, openCart } = useCart();
+  const { mostrarPrecios } = useSiteConfig();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState("");
@@ -135,7 +137,7 @@ export default function Header() {
               className="relative flex items-center justify-center gap-2.5 bg-accent text-white rounded-[10px] w-11 h-11 p-0 sm:w-auto sm:h-auto sm:px-[18px] sm:py-[11px] text-sm font-semibold cursor-pointer"
             >
               <CartIcon size={18} />
-              <span className="tnum hidden sm:inline">{money(subtotal)}</span>
+              {mostrarPrecios && <span className="tnum hidden sm:inline">{money(subtotal)}</span>}
               <span
                 ref={badgeRef}
                 className="tnum inline-flex items-center justify-center font-bold text-[11px] sm:text-xs absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-dark rounded-full sm:static sm:min-w-[20px] sm:h-5 sm:bg-white/20"
@@ -163,7 +165,7 @@ export default function Header() {
                 Retiro en tienda · <b className="text-white font-semibold">Maracaibo</b>
               </span>
               <span>
-                Delivery · <b className="text-white font-semibold">Zulia</b>
+                Delivery · <b className="text-white font-semibold">Maracaibo</b>
               </span>
             </div>
           </div>
@@ -222,7 +224,7 @@ export default function Header() {
             Retiro en tienda · <b className="text-white">Maracaibo</b>
           </span>
           <span>
-            Delivery · <b className="text-white">Zulia</b>
+            Delivery · <b className="text-white">Maracaibo</b>
           </span>
         </div>
       </aside>

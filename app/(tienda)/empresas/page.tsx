@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { waLink, WA_MENSAJES } from "@/lib/whatsapp";
 import Reveal from "@/components/Reveal";
 import { WhatsAppIcon } from "@/components/icons";
 
+// ⛔ Página OCULTA por ahora (a pedido del dueño). El código se conserva intacto.
+// Para reactivarla: quita este flag (o ponlo en true), vuelve a listar "Empresas"
+// en NAV (lib/site.ts), en el pie (Footer) y en el sitemap.
+const EMPRESAS_VISIBLE = false;
+
 export const metadata: Metadata = {
   title: "Empresas",
+  robots: { index: false, follow: false }, // no indexar mientras esté oculta
   description:
     "Suministro de papelería para oficinas, consultorios y colegios en Maracaibo. Compra por volumen con cuenta mensual, precios preferenciales y entrega programada. Cotización por WhatsApp.",
 };
@@ -23,6 +30,8 @@ const pasos = [
 ];
 
 export default function EmpresasPage() {
+  if (!EMPRESAS_VISIBLE) notFound(); // ruta inaccesible mientras esté oculta
+
   return (
     <section className="max-w-[1080px] mx-auto px-4 sm:px-7 pt-[30px] pb-12">
       {/* Migas de pan */}

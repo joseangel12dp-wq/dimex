@@ -23,10 +23,12 @@ export default async function TiendaLayout({
   const metodosPago = config?.metodos_pago?.length ? config.metodos_pago : METODOS_PAGO;
   const instagram = config?.instagram_url || SITE.instagramUrl;
   const tiktok = config?.tiktok_url || SITE.tiktokUrl;
+  // Por defecto true: si aún no existe la columna, los precios se ven normal.
+  const mostrarPrecios = config?.mostrar_precios ?? true;
 
   return (
     <CartProvider>
-      <ConfigProvider value={{ whatsapp, metodosPago }}>
+      <ConfigProvider value={{ whatsapp, metodosPago, mostrarPrecios }}>
         <a href="#contenido" className="skip-link">
           Saltar al contenido
         </a>

@@ -17,20 +17,28 @@ export const WA_MENSAJES = {
     "Hola DIMEX Empresas, quiero solicitar una cotización por volumen. Mi empresa/institución es:",
 };
 
-/** Mensaje del pedido con el contenido del carrito (basado en el §8). */
+/**
+ * Mensaje del pedido con el contenido del carrito (basado en el §8).
+ * Si `mostrarPrecios` es false, se envía solo la lista ordenada de productos
+ * (sin montos por línea ni subtotal); el resto del pedido es igual.
+ */
 export function buildOrderMessage(
   items: CartLine[],
   fulfillment: Fulfillment,
   customerName: string,
-  paymentMethod = ""
+  paymentMethod = "",
+  mostrarPrecios = true
 ): string {
   const lineas = items
-    .map((l) => `• ${l.qty}x ${l.name} — ${money(l.price * l.qty)}`)
+    .map((l) =>
+      mostrarPrecios
+        ? `• ${l.qty}x ${l.name} — ${money(l.price * l.qty)}`
+        : `• ${l.qty}x ${l.name}`
+    )
     .join("\n");
   const entrega = fulfillment === "delivery" ? "Delivery" : "Retiro en tienda";
   const nombre = customerName.trim() || "(sin especificar)";
   const pago = paymentMethod.trim() || "(por confirmar)";
-  return `Hola DIMEX, quiero hacer un pedido:\n\n${lineas}\n\nSubtotal: ${money(
-    cartSubtotal(items)
-  )}\n\nEntrega: ${entrega}\nPago: ${pago}\nNombre: ${nombre}`;
+  const subtotal = mostrarPrecios ? `\n\nSubtotal: ${money(cartSubtotal(items))}` : "";
+  return `Hola DIMEX, quiero hacer un pedido:\n\n${lineas}${subtotal}\n\nEntrega: ${entrega}\nPago: ${pago}\nNombre: ${nombre}`;
 }

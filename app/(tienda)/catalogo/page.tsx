@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getProductos, getCategoriasConConteo, parseOrden } from "@/lib/queries";
+import { getProductos, getCategoriasConConteo, getConfiguracion, parseOrden } from "@/lib/queries";
 import CatalogoView from "@/components/CatalogoView";
 
 export const metadata: Metadata = {
@@ -18,9 +18,10 @@ export default async function CatalogoPage({
   const q = typeof sp.q === "string" && sp.q.trim() ? sp.q.trim() : undefined;
   const orden = parseOrden(sp.orden);
 
-  const [productos, categorias] = await Promise.all([
+  const [productos, categorias, config] = await Promise.all([
     getProductos({ search: q, orden }),
     getCategoriasConConteo(),
+    getConfiguracion(),
   ]);
   const total = categorias.reduce((n, c) => n + c.count, 0);
 
@@ -33,6 +34,7 @@ export default async function CatalogoPage({
       categoriaActiva={null}
       orden={orden}
       q={q}
+      mostrarPrecios={config?.mostrar_precios ?? true}
     />
   );
 }

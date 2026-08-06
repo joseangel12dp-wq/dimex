@@ -4,7 +4,13 @@ import { money } from "@/lib/format";
 import MediaImagen from "@/components/MediaImagen";
 
 /** Tarjeta de kit (combo). Usada en el inicio y en el listado /kits. */
-export default function KitCard({ kit }: { kit: Kit }) {
+export default function KitCard({
+  kit,
+  mostrarPrecios = true,
+}: {
+  kit: Kit;
+  mostrarPrecios?: boolean;
+}) {
   const href = `/kits/${kit.slug}`;
 
   return (
@@ -25,11 +31,13 @@ export default function KitCard({ kit }: { kit: Kit }) {
             {kit.descripcion}
           </p>
         )}
-        <div className="flex items-baseline gap-2.5 mt-0.5">
-          <span className="tnum text-[23px] font-extrabold text-brand-ink tracking-[-.02em]">
-            {money(kit.precio)}
-          </span>
-        </div>
+        {mostrarPrecios && (
+          <div className="flex items-baseline gap-2.5 mt-0.5">
+            <span className="tnum text-[23px] font-extrabold text-brand-ink tracking-[-.02em]">
+              {money(kit.precio)}
+            </span>
+          </div>
+        )}
         <Link
           href={href}
           className="mt-2 bg-brand text-white rounded-[10px] py-[13px] text-center text-[15px] font-semibold hover:opacity-95"

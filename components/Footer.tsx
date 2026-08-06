@@ -25,7 +25,6 @@ export default function Footer({
 
         <div className="flex flex-wrap items-center gap-[26px] text-sm text-[#5c646d]">
           <Link href="/kits" className="text-[#5c646d]">Kits</Link>
-          <Link href="/empresas" className="text-[#5c646d]">Empresas</Link>
           <Link href="/catalogo" className="text-[#5c646d]">Productos</Link>
           <Link href="/nosotros" className="text-[#5c646d]">Nosotros</Link>
           <a

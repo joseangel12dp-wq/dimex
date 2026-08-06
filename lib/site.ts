@@ -25,25 +25,23 @@ export const SITE = {
   estado: "Zulia",
   instagramUrl: "#", // TODO: enlace real de Instagram
   tiktokUrl: "#", // TODO: enlace real de TikTok
-  // Embed de Google Maps (centrado en Maracaibo mientras no haya coordenadas exactas).
+  // Embed de Google Maps con la ubicación real de la tienda (pin con nombre).
   mapaEmbed:
-    "https://maps.google.com/maps?q=Maracaibo,%20Zulia,%20Venezuela&z=13&output=embed",
+    "https://maps.google.com/maps?q=10.680094324205516,-71.60626154338263(Papeler%C3%ADa%20DIMEX,%20Maracaibo)&z=16&output=embed",
 };
 
-// Métodos de pago (footer del prototipo y tabla configuracion.metodos_pago).
-export const METODOS_PAGO = [
-  "Pago móvil",
-  "Efectivo $",
-  "Zelle",
-  "USDT",
-  "Transferencia",
-];
+// Coordenadas de la tienda (para "Cómo llegar" y datos estructurados).
+export const COORDS = { lat: 10.680094324205516, lng: -71.60626154338263 };
+
+// Métodos de pago por defecto (la lista real vive en configuracion.metodos_pago).
+export const METODOS_PAGO = ["Pago móvil", "Zelle", "Punto de venta", "Efectivo"];
 
 // Navegación principal (URLs reales, sitio multipágina).
+// "Empresas" está oculta por ahora (se puede reactivar agregándola aquí,
+// quitando el notFound() de su página y volviendo a listarla en el pie/sitemap).
 export const NAV = [
   { label: "Inicio", href: "/" },
   { label: "Kits", href: "/kits" },
   { label: "Categorías", href: "/catalogo" },
-  { label: "Empresas", href: "/empresas" },
   { label: "Nosotros", href: "/nosotros" },
 ];

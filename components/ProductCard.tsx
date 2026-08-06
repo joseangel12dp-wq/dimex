@@ -6,9 +6,15 @@ import AgregarButton from "@/components/AgregarButton";
 import { WhatsAppIcon } from "@/components/icons";
 
 /** Tarjeta de producto (usada en inicio, catálogo y categoría). */
-export default function ProductCard({ p }: { p: Producto }) {
+export default function ProductCard({
+  p,
+  mostrarPrecios = true,
+}: {
+  p: Producto;
+  mostrarPrecios?: boolean;
+}) {
   const rebaja = descuentoLabel(p.precio, p.precio_anterior);
-  const tieneRebaja = rebaja !== null;
+  const tieneRebaja = rebaja !== null && mostrarPrecios;
 
   return (
     <div className="bg-white border border-line rounded-[15px] overflow-hidden flex flex-col transition-[transform,box-shadow] duration-[350ms] hover:-translate-y-[5px] hover:shadow-[0_18px_40px_-22px_rgba(20,30,45,.32)]">
@@ -33,22 +39,24 @@ export default function ProductCard({ p }: { p: Producto }) {
       </div>
 
       <div className="p-[18px] pt-[18px] flex flex-col gap-2 flex-1">
-        <div className="flex items-baseline gap-[9px]">
-          {tieneRebaja ? (
-            <>
-              <span className="tnum text-[19px] font-extrabold text-accent tracking-[-.02em]">
+        {mostrarPrecios && (
+          <div className="flex items-baseline gap-[9px]">
+            {tieneRebaja ? (
+              <>
+                <span className="tnum text-[19px] font-extrabold text-accent tracking-[-.02em]">
+                  {money(p.precio)}
+                </span>
+                <span className="tnum text-[13.5px] text-[#a2aab2] line-through">
+                  {money(p.precio_anterior!)}
+                </span>
+              </>
+            ) : (
+              <span className="tnum text-[19px] font-extrabold text-brand-ink tracking-[-.02em]">
                 {money(p.precio)}
               </span>
-              <span className="tnum text-[13.5px] text-[#a2aab2] line-through">
-                {money(p.precio_anterior!)}
-              </span>
-            </>
-          ) : (
-            <span className="tnum text-[19px] font-extrabold text-brand-ink tracking-[-.02em]">
-              {money(p.precio)}
-            </span>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         <h3 className="m-0 text-[15.5px] font-bold tracking-[-.01em] leading-[1.25]">
           {p.nombre}

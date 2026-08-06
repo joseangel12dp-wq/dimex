@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getKits } from "@/lib/queries";
+import { getKits, getConfiguracion } from "@/lib/queries";
 import Reveal from "@/components/Reveal";
 import KitCard from "@/components/KitCard";
 import JsonLd from "@/components/JsonLd";
@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function KitsPage() {
-  const kits = await getKits();
+  const [kits, config] = await Promise.all([getKits(), getConfiguracion()]);
+  const mostrarPrecios = config?.mostrar_precios ?? true;
 
   return (
     <section className="max-w-[1280px] mx-auto px-4 sm:px-7 pt-[30px] pb-10">
@@ -53,7 +54,7 @@ export default async function KitsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
           {kits.map((kit, i) => (
             <Reveal key={kit.id} delay={i}>
-              <KitCard kit={kit} />
+              <KitCard kit={kit} mostrarPrecios={mostrarPrecios} />
             </Reveal>
           ))}
         </div>

@@ -9,6 +9,7 @@ import { createContext, useContext } from "react";
 export type SiteConfig = {
   whatsapp: string;
   metodosPago: string[];
+  mostrarPrecios: boolean;
 };
 
 const Ctx = createContext<SiteConfig | null>(null);

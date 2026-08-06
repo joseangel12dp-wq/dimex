@@ -79,6 +79,7 @@ export type Configuracion = {
   instagram_url: string | null;
   tiktok_url: string | null;
   mapa_embed: string | null;
+  mostrar_precios: boolean;
   created_at: string;
   updated_at: string;
 };

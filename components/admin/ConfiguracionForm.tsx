@@ -20,6 +20,26 @@ export default function ConfiguracionForm({
 
   return (
     <form action={formAction} className="max-w-[640px] flex flex-col gap-5">
+      {/* Interruptor global de precios */}
+      <div className="border border-line rounded-xl p-4 bg-white flex items-start gap-3">
+        <input
+          id="mostrar_precios"
+          name="mostrar_precios"
+          type="checkbox"
+          defaultChecked={config?.mostrar_precios ?? true}
+          className="w-5 h-5 mt-0.5 shrink-0"
+        />
+        <label htmlFor="mostrar_precios" className="cursor-pointer">
+          <span className="block text-[15px] font-semibold text-ink">
+            Mostrar precios en la tienda
+          </span>
+          <span className="block text-[13px] text-muted-2 mt-0.5">
+            Si lo apagas, la tienda no muestra montos (tarjetas, kits, carrito ni WhatsApp). El
+            carrito sigue funcionando: al cliente le llega su lista de productos sin precios.
+          </span>
+        </label>
+      </div>
+
       <div className="flex flex-col gap-1.5 max-w-[320px]">
         <label htmlFor="whatsapp" className={labelCls}>WhatsApp (solo números, con código de país)</label>
         <input

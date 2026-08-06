@@ -75,7 +75,7 @@ export default async function NosotrosPage() {
             </div>
             <div className="flex gap-2.5 flex-wrap">
               <a
-                href="https://maps.google.com/maps?q=Maracaibo,%20Zulia,%20Venezuela"
+                href="https://www.google.com/maps/search/?api=1&query=10.680094324205516,-71.60626154338263"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-brand text-white rounded-[10px] px-[18px] py-3 text-sm font-semibold inline-flex items-center gap-2"
