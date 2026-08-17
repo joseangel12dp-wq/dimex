@@ -41,6 +41,21 @@ export async function getProductoAdmin(id: string): Promise<Producto | null> {
   return data ? normProducto(data as Producto) : null;
 }
 
+/** URLs de las fotos de un producto, en orden (para precargar la galería del panel). */
+export async function getImagenesProducto(productoId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("producto_imagenes")
+    .select("url, orden")
+    .eq("producto_id", productoId)
+    .order("orden");
+  if (error) {
+    console.error("getImagenesProducto:", error.message);
+    return [];
+  }
+  return (data ?? []).map((r) => (r as { url: string }).url);
+}
+
 export async function getCategoriasAdmin(): Promise<Categoria[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -119,4 +134,19 @@ export async function getPromocionAdmin(id: string): Promise<Promocion | null> {
     return null;
   }
   return data as Promocion | null;
+}
+
+/** IDs de los productos asociados a una promoción (para precargar el selector). */
+export async function getProductoIdsDePromocion(promocionId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("promocion_productos")
+    .select("producto_id")
+    .eq("promocion_id", promocionId)
+    .order("orden");
+  if (error) {
+    console.error("getProductoIdsDePromocion:", error.message);
+    return [];
+  }
+  return (data ?? []).map((r) => (r as { producto_id: string }).producto_id);
 }

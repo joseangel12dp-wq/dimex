@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import type { Categoria } from "@/types/db";
 import type { FormState } from "@/lib/admin";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 const inputCls =
   "border border-[#e3e6ea] rounded-[10px] px-[15px] py-3 text-[15px] outline-none focus:border-brand bg-white";
@@ -38,6 +39,11 @@ export default function CategoriaForm({
           defaultValue={categoria?.orden ?? 0}
           className={inputCls}
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className={labelCls}>Imagen de la categoría</span>
+        <ImageUploader tipo="categoria" folder="categorias" currentUrl={categoria?.imagen_url} />
       </div>
 
       <label className="flex items-center gap-2 text-sm text-[#2a2f36] cursor-pointer">

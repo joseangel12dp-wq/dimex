@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
-import { getKitSlugs, getCategorias } from "@/lib/queries";
+import { getKitSlugs, getCategorias, getPromocionSlugs } from "@/lib/queries";
 
 export const revalidate = 3600; // se regenera cada hora
 
@@ -10,7 +10,11 @@ export const revalidate = 3600; // se regenera cada hora
  * mayor prioridad (son la principal fuente de tráfico del negocio).
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [kits, categorias] = await Promise.all([getKitSlugs(), getCategorias()]);
+  const [kits, categorias, promos] = await Promise.all([
+    getKitSlugs(),
+    getCategorias(),
+    getPromocionSlugs(),
+  ]);
   const now = new Date();
 
   const fijas: MetadataRoute.Sitemap = [
@@ -35,5 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...fijas, ...kitsUrls, ...catUrls];
+  const promoUrls: MetadataRoute.Sitemap = promos.map((p) => ({
+    url: `${SITE_URL}/promocion/${p.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
+
+  return [...fijas, ...kitsUrls, ...catUrls, ...promoUrls];
 }

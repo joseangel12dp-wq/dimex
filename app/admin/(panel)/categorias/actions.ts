@@ -18,7 +18,8 @@ function parse(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const orden = Number(String(formData.get("orden") ?? "0")) || 0;
   const activa = formData.get("activa") === "on";
-  return { nombre, orden, activa };
+  const imagen_url = String(formData.get("imagen_url") ?? "").trim() || null;
+  return { nombre, orden, activa, imagen_url };
 }
 
 export async function crearCategoria(_prev: FormState, formData: FormData): Promise<FormState> {

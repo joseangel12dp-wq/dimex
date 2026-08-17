@@ -2,9 +2,10 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import type { Promocion } from "@/types/db";
+import type { Promocion, Producto } from "@/types/db";
 import type { FormState } from "@/lib/admin";
 import ImageUploader from "@/components/admin/ImageUploader";
+import ProductPicker from "@/components/admin/ProductPicker";
 
 const inputCls =
   "border border-[#e3e6ea] rounded-[10px] px-[15px] py-3 text-[15px] outline-none focus:border-brand bg-white";
@@ -17,9 +18,13 @@ const soloFecha = (iso: string | null) => (iso ? iso.slice(0, 10) : "");
 export default function PromocionForm({
   promocion,
   action,
+  productos,
+  seleccionados = [],
 }: {
   promocion?: Promocion;
   action: (prev: FormState, fd: FormData) => Promise<FormState>;
+  productos: Producto[];
+  seleccionados?: string[];
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
 
@@ -50,20 +55,19 @@ export default function PromocionForm({
         />
       </div>
 
-      <div className="flex flex-col gap-1.5 max-w-[320px]">
-        <label htmlFor="enlace" className={labelCls}>Enlace del botón (ej. /kits)</label>
-        <input
-          id="enlace"
-          name="enlace"
-          defaultValue={promocion?.enlace ?? ""}
-          placeholder="/kits"
-          className={inputCls}
-        />
-      </div>
-
       <div className="flex flex-col gap-2">
         <span className={labelCls}>Imagen del banner (opcional)</span>
         <ImageUploader tipo="promocion" folder="promociones" currentUrl={promocion?.imagen_url} />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className={labelCls}>Productos de esta promoción</span>
+        <p className="m-0 text-[13px] text-muted-2">
+          Marca los productos que forman parte de la colección. El botón del banner llevará a la
+          página de esta promoción, donde el cliente verá justo estos productos. El precio y el
+          descuento salen de cada producto (no de la promoción).
+        </p>
+        <ProductPicker productos={productos} seleccionados={seleccionados} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-[420px]">

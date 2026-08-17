@@ -11,7 +11,7 @@ type SB = Awaited<ReturnType<typeof createClient>>;
  */
 export async function slugUnico(
   supabase: SB,
-  tabla: "productos" | "kits" | "categorias",
+  tabla: "productos" | "kits" | "categorias" | "promociones",
   base: string,
   excludeId?: string
 ): Promise<string> {

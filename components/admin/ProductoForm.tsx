@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import type { Categoria, Producto } from "@/types/db";
 import type { FormState } from "@/lib/admin";
-import ImageUploader from "@/components/admin/ImageUploader";
+import ProductImagesUploader from "@/components/admin/ProductImagesUploader";
 
 const inputCls =
   "border border-[#e3e6ea] rounded-[10px] px-[15px] py-3 text-[15px] outline-none focus:border-brand bg-white";
@@ -15,10 +15,12 @@ export default function ProductoForm({
   categorias,
   producto,
   action,
+  imagenes = [],
 }: {
   categorias: Categoria[];
   producto?: Producto;
   action: (prev: FormState, fd: FormData) => Promise<FormState>;
+  imagenes?: string[];
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
 
@@ -105,8 +107,12 @@ export default function ProductoForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className={labelCls}>Imagen</span>
-        <ImageUploader tipo="producto" folder="productos" currentUrl={producto?.imagen_url} />
+        <span className={labelCls}>Fotos del producto</span>
+        <p className="m-0 text-[13px] text-muted-2">
+          Sube varias. La primera es la portada (la que se ve en la tienda). Arrastra las
+          miniaturas para reordenar, o usa ◀ ▶ y “Portada”.
+        </p>
+        <ProductImagesUploader initial={imagenes} />
       </div>
 
       {state.error && <p className="m-0 text-sm text-accent">{state.error}</p>}

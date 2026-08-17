@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductoAdmin, getCategoriasAdmin } from "@/lib/admin-queries";
+import {
+  getProductoAdmin,
+  getCategoriasAdmin,
+  getImagenesProducto,
+} from "@/lib/admin-queries";
 import ProductoForm from "@/components/admin/ProductoForm";
 import { actualizarProducto } from "../actions";
 
@@ -10,9 +14,10 @@ export default async function EditarProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [producto, categorias] = await Promise.all([
+  const [producto, categorias, imagenes] = await Promise.all([
     getProductoAdmin(id),
     getCategoriasAdmin(),
+    getImagenesProducto(id),
   ]);
   if (!producto) notFound();
 
@@ -22,7 +27,12 @@ export default async function EditarProductoPage({
         ← Volver a productos
       </Link>
       <h1 className="m-0 mb-6 text-2xl font-extrabold tracking-[-.02em] text-ink">Editar producto</h1>
-      <ProductoForm categorias={categorias} producto={producto} action={actualizarProducto} />
+      <ProductoForm
+        categorias={categorias}
+        producto={producto}
+        action={actualizarProducto}
+        imagenes={imagenes}
+      />
     </div>
   );
 }

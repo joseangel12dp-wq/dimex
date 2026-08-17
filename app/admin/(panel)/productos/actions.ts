@@ -25,7 +25,9 @@ function parse(formData: FormData) {
   const es_nuevo = formData.get("es_nuevo") === "on";
   const destacado = formData.get("destacado") === "on";
   const activo = formData.get("activo") === "on";
-  const imagen_url = String(formData.get("imagen_url") ?? "").trim() || null;
+  // Lista de fotos en orden (galería). La primera es la portada.
+  const imagenes = formData.getAll("imagen_urls").map(String).filter(Boolean);
+  const imagen_url = imagenes[0] ?? null; // portada = primera foto
   return {
     nombre,
     descripcion,
@@ -36,7 +38,22 @@ function parse(formData: FormData) {
     destacado,
     activo,
     imagen_url,
+    imagenes,
   };
+}
+
+// Reescribe la galería de un producto con la lista ordenada de URLs.
+async function guardarImagenes(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  productoId: string,
+  urls: string[]
+): Promise<string | null> {
+  const del = await supabase.from("producto_imagenes").delete().eq("producto_id", productoId);
+  if (del.error) return del.error.message;
+  if (urls.length === 0) return null;
+  const filas = urls.map((url, i) => ({ producto_id: productoId, url, orden: i }));
+  const ins = await supabase.from("producto_imagenes").insert(filas);
+  return ins.error ? ins.error.message : null;
 }
 
 function validar(d: ReturnType<typeof parse>): string | null {
@@ -55,10 +72,18 @@ export async function crearProducto(_prev: FormState, formData: FormData): Promi
   const err = validar(d);
   if (err) return { error: err };
 
+  const { imagenes, ...campos } = d; // `imagenes` no es columna de productos
   const supabase = await createClient();
   const slug = await slugUnico(supabase, "productos", slugify(d.nombre));
-  const { error } = await supabase.from("productos").insert({ ...d, slug });
-  if (error) return { error: error.message };
+  const { data, error } = await supabase
+    .from("productos")
+    .insert({ ...campos, slug })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message ?? "No se pudo crear el producto." };
+
+  const imgErr = await guardarImagenes(supabase, data.id, imagenes);
+  if (imgErr) return { error: imgErr };
 
   revalidar();
   redirect("/admin/productos");
@@ -75,10 +100,14 @@ export async function actualizarProducto(_prev: FormState, formData: FormData): 
   const err = validar(d);
   if (err) return { error: err };
 
+  const { imagenes, ...campos } = d; // `imagenes` no es columna de productos
   const supabase = await createClient();
   const slug = await slugUnico(supabase, "productos", slugify(d.nombre), id);
-  const { error } = await supabase.from("productos").update({ ...d, slug }).eq("id", id);
+  const { error } = await supabase.from("productos").update({ ...campos, slug }).eq("id", id);
   if (error) return { error: error.message };
+
+  const imgErr = await guardarImagenes(supabase, id, imagenes);
+  if (imgErr) return { error: imgErr };
 
   revalidar();
   redirect("/admin/productos");

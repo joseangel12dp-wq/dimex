@@ -66,6 +66,56 @@ export async function getPromocionActiva(): Promise<Promocion | null> {
   return data as Promocion | null;
 }
 
+/** Una promoción por su slug, con sus productos activos (para /promocion/[slug]). */
+export async function getPromocionBySlug(
+  slug: string
+): Promise<{ promocion: Promocion; productos: Producto[] } | null> {
+  const supabase = createPublicClient();
+  const { data: promo, error } = await supabase
+    .from("promociones")
+    .select("*")
+    .eq("slug", slug)
+    .eq("activa", true)
+    .maybeSingle();
+  if (error) {
+    console.error("getPromocionBySlug:", error.message);
+    return null;
+  }
+  if (!promo) return null;
+
+  // Productos asociados (solo los activos), en el orden definido.
+  const { data: filas, error: e2 } = await supabase
+    .from("promocion_productos")
+    .select("orden, productos!inner(*)")
+    .eq("promocion_id", (promo as Promocion).id)
+    .eq("productos.activo", true)
+    .order("orden");
+  if (e2) {
+    console.error("getPromocionBySlug (productos):", e2.message);
+    return { promocion: promo as Promocion, productos: [] };
+  }
+
+  const productos = (filas ?? []).map((f) => {
+    const p = (f as unknown as { productos: Producto }).productos;
+    return normProducto(p);
+  });
+  return { promocion: promo as Promocion, productos };
+}
+
+/** Slugs de promociones activas (para rutas estáticas y sitemap). */
+export async function getPromocionSlugs(): Promise<{ slug: string }[]> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("promociones")
+    .select("slug")
+    .eq("activa", true);
+  if (error) {
+    console.error("getPromocionSlugs:", error.message);
+    return [];
+  }
+  return (data ?? []) as { slug: string }[];
+}
+
 // ---------------------------------------------------------------------
 // Categorías
 // ---------------------------------------------------------------------

@@ -14,6 +14,7 @@ export type Categoria = {
   nombre: string;
   orden: number;
   activa: boolean;
+  imagen_url: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -34,6 +35,15 @@ export type Producto = {
   updated_at: string;
 };
 
+// Fotos de un producto (galería con orden; la primera es la portada).
+export type ProductoImagen = {
+  id: string;
+  producto_id: string;
+  url: string;
+  orden: number;
+  created_at: string;
+};
+
 // Un kit es un combo simple: nombre, descripción, imagen y precio.
 export type Kit = {
   id: string;
@@ -50,6 +60,7 @@ export type Kit = {
 
 export type Promocion = {
   id: string;
+  slug: string;
   titulo: string;
   subtitulo: string | null;
   imagen_url: string | null;

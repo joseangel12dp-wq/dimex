@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPromocionAdmin } from "@/lib/admin-queries";
+import {
+  getPromocionAdmin,
+  getProductosAdmin,
+  getProductoIdsDePromocion,
+} from "@/lib/admin-queries";
 import PromocionForm from "@/components/admin/PromocionForm";
 import { actualizarPromocion } from "../actions";
 
@@ -10,7 +14,11 @@ export default async function EditarPromocionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const promocion = await getPromocionAdmin(id);
+  const [promocion, productos, seleccionados] = await Promise.all([
+    getPromocionAdmin(id),
+    getProductosAdmin(),
+    getProductoIdsDePromocion(id),
+  ]);
   if (!promocion) notFound();
 
   return (
@@ -19,7 +27,12 @@ export default async function EditarPromocionPage({
         ← Volver a promociones
       </Link>
       <h1 className="m-0 mb-6 text-2xl font-extrabold tracking-[-.02em] text-ink">Editar promoción</h1>
-      <PromocionForm promocion={promocion} action={actualizarPromocion} />
+      <PromocionForm
+        promocion={promocion}
+        action={actualizarPromocion}
+        productos={productos}
+        seleccionados={seleccionados}
+      />
     </div>
   );
 }

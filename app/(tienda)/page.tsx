@@ -40,7 +40,9 @@ export default async function HomePage() {
   const mostrarPrecios = config?.mostrar_precios ?? true;
   const heroEyebrow = promo?.titulo ?? "Vuelta a clases";
   const heroTitulo = promo?.subtitulo ?? "Todo lo que escribe tu día, en un solo lugar.";
-  const heroHref = promo?.enlace ?? "/kits";
+  // El botón del banner lleva a la página de la promoción vigente. Si aún no
+  // hay slug (p. ej. antes de la migración) cae al enlace anterior o a /kits.
+  const heroHref = promo?.slug ? `/promocion/${promo.slug}` : promo?.enlace ?? "/kits";
 
   const direccion = config?.direccion ?? SITE.direccion;
   const horario = config?.horario ?? SITE.horario;
