@@ -48,7 +48,7 @@ export default async function ProductosAdminPage({
         <input
           name="q"
           defaultValue={q}
-          placeholder="Buscar por nombre o descripción…"
+          placeholder="Buscar por nombre, descripción o código…"
           aria-label="Buscar productos"
           className="border-0 outline-none w-full text-[15px] bg-transparent text-body"
         />
@@ -79,6 +79,11 @@ export default async function ProductosAdminPage({
                   <span>{nombreCat(p.categoria_id)}</span>
                   <span>·</span>
                   <span className="tnum text-[#2a2f36] font-semibold">{money(p.precio)}</span>
+                  <span>·</span>
+                  <span className={`tnum font-semibold ${p.existencia > 0 ? "text-[#2a2f36]" : "text-accent"}`}>
+                    {p.existencia > 0 ? `${p.existencia} ${p.unidad ?? "und"}` : "Sin existencia"}
+                  </span>
+                  {p.codigo && <span className="tnum">#{p.codigo}</span>}
                   {p.precio_anterior && (
                     <span className="tnum line-through">{money(p.precio_anterior)}</span>
                   )}

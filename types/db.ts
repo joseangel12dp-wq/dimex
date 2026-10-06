@@ -31,6 +31,9 @@ export type Producto = {
   destacado: boolean;
   imagen_url: string | null;
   activo: boolean;
+  codigo: string | null; // código de barras / interno del inventario
+  existencia: number;
+  unidad: string | null; // PZA, PAQ, METRO…
   created_at: string;
   updated_at: string;
 };

@@ -12,6 +12,7 @@ function normProducto(p: Producto): Producto {
     ...p,
     precio: Number(p.precio),
     precio_anterior: p.precio_anterior == null ? null : Number(p.precio_anterior),
+    existencia: Number(p.existencia ?? 0),
   };
 }
 
@@ -21,7 +22,7 @@ export async function getProductosAdmin(search?: string): Promise<Producto[]> {
   if (search) {
     // Limpiamos caracteres que romperían el filtro `or` de PostgREST.
     const term = search.replace(/[,()%*]/g, " ").trim();
-    if (term) q = q.or(`nombre.ilike.%${term}%,descripcion.ilike.%${term}%`);
+    if (term) q = q.or(`nombre.ilike.%${term}%,descripcion.ilike.%${term}%,codigo.ilike.%${term}%`);
   }
   const { data, error } = await q.order("nombre");
   if (error) {

@@ -22,6 +22,10 @@ function normProducto(p: Producto): Producto {
     ...p,
     precio: Number(p.precio),
     precio_anterior: p.precio_anterior == null ? null : Number(p.precio_anterior),
+    // Datos internos del inventario: no salen a la tienda pública (solo el panel los ve).
+    codigo: null,
+    existencia: 0,
+    unidad: null,
   };
 }
 function normKit(k: Kit): Kit {

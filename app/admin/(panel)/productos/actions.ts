@@ -25,6 +25,9 @@ function parse(formData: FormData) {
   const es_nuevo = formData.get("es_nuevo") === "on";
   const destacado = formData.get("destacado") === "on";
   const activo = formData.get("activo") === "on";
+  const codigo = String(formData.get("codigo") ?? "").trim() || null;
+  const existencia = Number(String(formData.get("existencia") ?? "0").replace(",", ".") || 0);
+  const unidad = String(formData.get("unidad") ?? "").trim() || null;
   // Lista de fotos en orden (galería). La primera es la portada.
   const imagenes = formData.getAll("imagen_urls").map(String).filter(Boolean);
   const imagen_url = imagenes[0] ?? null; // portada = primera foto
@@ -37,6 +40,9 @@ function parse(formData: FormData) {
     es_nuevo,
     destacado,
     activo,
+    codigo,
+    existencia,
+    unidad,
     imagen_url,
     imagenes,
   };
@@ -61,6 +67,7 @@ function validar(d: ReturnType<typeof parse>): string | null {
   if (!Number.isFinite(d.precio) || d.precio < 0) return "El precio no es válido.";
   if (d.precio_anterior !== null && (!Number.isFinite(d.precio_anterior) || d.precio_anterior < 0))
     return "El precio anterior no es válido.";
+  if (!Number.isFinite(d.existencia) || d.existencia < 0) return "La existencia no es válida.";
   return null;
 }
 

@@ -91,6 +91,35 @@ export default function ProductoForm({
         />
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="codigo" className={labelCls}>Código</label>
+          <input id="codigo" name="codigo" defaultValue={producto?.codigo ?? ""} className={inputCls} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="existencia" className={labelCls}>Existencia</label>
+          <input
+            id="existencia"
+            name="existencia"
+            type="number"
+            step="0.01"
+            min="0"
+            defaultValue={producto?.existencia ?? 0}
+            className={inputCls}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="unidad" className={labelCls}>Unidad</label>
+          <input
+            id="unidad"
+            name="unidad"
+            placeholder="PZA, PAQ, METRO…"
+            defaultValue={producto?.unidad ?? ""}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-x-6 gap-y-3">
         <label className="flex items-center gap-2 text-sm text-[#2a2f36] cursor-pointer">
           <input type="checkbox" name="es_nuevo" defaultChecked={producto?.es_nuevo ?? false} className="w-4 h-4" />
