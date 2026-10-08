@@ -2,7 +2,7 @@
 //
 //  - Productos NUEVOS: se crean OCULTOS (activo = false), precio 0, con nombre,
 //    código, unidad y existencia. El dueño los revisa y los activa a mano.
-//  - Productos que YA EXISTEN (mismo código, o mismo nombre si no tiene código):
+//  - Productos que YA EXISTEN (mismo código):
 //    solo se actualiza la existencia y la unidad. No se toca nombre, precio,
 //    fotos ni visibilidad. Así el script sirve también para actualizar stock.
 //
@@ -10,12 +10,16 @@
 //
 // Correr con:
 //   node --env-file=.env.local scripts/importar-inventario.mjs ruta/al/archivo.csv
-//   (agrega --prueba para ver qué haría sin escribir nada)
+//   (agrega --prueba para ver qué haría sin escribir nada;
+//    --solo-con-existencia para no crear productos que están en 0)
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 const args = process.argv.slice(2);
 const prueba = args.includes("--prueba");
+// Con --solo-con-existencia no se CREAN productos en 0 o negativo
+// (los que ya existen igual se actualizan, aunque queden en 0).
+const soloConExistencia = args.includes("--solo-con-existencia");
 const ruta = args.find((a) => !a.startsWith("--"));
 if (!ruta) {
   console.error("❌ Indica el archivo CSV: node --env-file=.env.local scripts/importar-inventario.mjs archivo.csv");
@@ -99,7 +103,6 @@ for (let desde = 0; ; desde += 1000) {
   if (data.length < 1000) break;
 }
 const porCodigo = new Map(actuales.filter((p) => p.codigo).map((p) => [p.codigo, p]));
-const porNombre = new Map(actuales.map((p) => [p.nombre.toUpperCase(), p]));
 const slugs = new Set(actuales.map((p) => p.slug));
 const slugUnico = (base) => {
   let s = base;
@@ -110,10 +113,13 @@ const slugUnico = (base) => {
 
 const nuevos = [];
 const actualizar = [];
+const sinExistencia = [];
 for (const it of items) {
-  const existente = porCodigo.get(it.codigo) ?? porNombre.get(it.nombre.toUpperCase());
+  const existente = porCodigo.get(it.codigo);
   if (existente) {
     actualizar.push({ id: existente.id, existencia: it.existencia, unidad: it.unidad, nombre: it.nombre });
+  } else if (soloConExistencia && it.existencia <= 0) {
+    sinExistencia.push(it);
   } else {
     nuevos.push({
       ...it,
@@ -127,6 +133,7 @@ for (const it of items) {
 console.log(`\nCSV: ${items.length} productos`);
 console.log(`  • Nuevos (se crean ocultos): ${nuevos.length}`);
 console.log(`  • Ya existen (solo se actualiza existencia): ${actualizar.length}`);
+if (sinExistencia.length) console.log(`  • No creados por estar en 0: ${sinExistencia.length}`);
 if (sinCodigo.length) {
   console.log(`  • Omitidos por no tener código: ${sinCodigo.length}`);
   for (const x of sinCodigo) console.log(`      - ${x.nombre}`);
@@ -150,7 +157,8 @@ let fallos = 0;
 for (const a of actualizar) {
   const { error } = await supabase
     .from("productos")
-    .update({ existencia: a.existencia, unidad: a.unidad })
+    // Si el archivo no trae unidad, se conserva la que ya tenía.
+    .update(a.unidad ? { existencia: a.existencia, unidad: a.unidad } : { existencia: a.existencia })
     .eq("id", a.id);
   if (error) { fallos++; console.error(`  ⚠️ ${a.nombre}: ${error.message}`); }
 }

@@ -16,20 +16,57 @@ function normProducto(p: Producto): Producto {
   };
 }
 
+// Limpiamos caracteres que romperían el filtro `or` de PostgREST.
+function filtroBusqueda(search: string): string | null {
+  const term = search.replace(/[,()%*]/g, " ").trim();
+  return term ? `nombre.ilike.%${term}%,descripcion.ilike.%${term}%,codigo.ilike.%${term}%` : null;
+}
+
+/** TODOS los productos (en tandas de 1000, el máximo que entrega Supabase por consulta). */
 export async function getProductosAdmin(search?: string): Promise<Producto[]> {
   const supabase = await createClient();
-  let q = supabase.from("productos").select("*");
-  if (search) {
-    // Limpiamos caracteres que romperían el filtro `or` de PostgREST.
-    const term = search.replace(/[,()%*]/g, " ").trim();
-    if (term) q = q.or(`nombre.ilike.%${term}%,descripcion.ilike.%${term}%,codigo.ilike.%${term}%`);
+  const filtro = search ? filtroBusqueda(search) : null;
+  const todos: Producto[] = [];
+  for (let desde = 0; ; desde += 1000) {
+    let q = supabase.from("productos").select("*");
+    if (filtro) q = q.or(filtro);
+    const { data, error } = await q.order("nombre").order("id").range(desde, desde + 999);
+    if (error) {
+      console.error("getProductosAdmin:", error.message);
+      return todos;
+    }
+    todos.push(...(data ?? []).map((p) => normProducto(p as Producto)));
+    if ((data ?? []).length < 1000) return todos;
   }
-  const { data, error } = await q.order("nombre");
+}
+
+/** Una página del listado del panel, con búsqueda y filtro visible/oculto. */
+export async function getProductosAdminPagina({
+  search,
+  estado,
+  pagina,
+  porPagina,
+}: {
+  search?: string;
+  estado?: "visibles" | "ocultos";
+  pagina: number;
+  porPagina: number;
+}): Promise<{ productos: Producto[]; total: number }> {
+  const supabase = await createClient();
+  let q = supabase.from("productos").select("*", { count: "exact" });
+  const filtro = search ? filtroBusqueda(search) : null;
+  if (filtro) q = q.or(filtro);
+  if (estado) q = q.eq("activo", estado === "visibles");
+  const desde = (pagina - 1) * porPagina;
+  const { data, error, count } = await q
+    .order("nombre")
+    .order("id")
+    .range(desde, desde + porPagina - 1);
   if (error) {
-    console.error("getProductosAdmin:", error.message);
-    return [];
+    console.error("getProductosAdminPagina:", error.message);
+    return { productos: [], total: 0 };
   }
-  return (data ?? []).map((p) => normProducto(p as Producto));
+  return { productos: (data ?? []).map((p) => normProducto(p as Producto)), total: count ?? 0 };
 }
 
 export async function getProductoAdmin(id: string): Promise<Producto | null> {

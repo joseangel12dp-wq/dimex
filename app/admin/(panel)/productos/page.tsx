@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProductosAdmin, getCategoriasAdmin } from "@/lib/admin-queries";
+import { getProductosAdminPagina, getCategoriasAdmin } from "@/lib/admin-queries";
 import { getSessionProfile } from "@/lib/auth";
 import { money } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
@@ -9,17 +9,32 @@ import { alternarActivoProducto, eliminarProducto } from "./actions";
 export default async function ProductosAdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; estado?: string; pagina?: string }>;
 }) {
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const estado = sp.estado === "visibles" || sp.estado === "ocultos" ? sp.estado : undefined;
+  const pagina = Math.max(1, Number(sp.pagina) || 1);
+  const POR_PAGINA = 100;
 
-  const [productos, categorias, perfil] = await Promise.all([
-    getProductosAdmin(q || undefined),
+  const [{ productos, total }, categorias, perfil] = await Promise.all([
+    getProductosAdminPagina({ search: q || undefined, estado, pagina, porPagina: POR_PAGINA }),
     getCategoriasAdmin(),
     getSessionProfile(),
   ]);
   const esDueno = perfil?.rol === "dueno";
+  const paginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+  // Arma la URL del listado conservando búsqueda/filtro.
+  const url = (cambios: { estado?: string; pagina?: number }) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    const e = "estado" in cambios ? cambios.estado : estado;
+    if (e) params.set("estado", e);
+    const pg = cambios.pagina ?? 1;
+    if (pg > 1) params.set("pagina", String(pg));
+    const s = params.toString();
+    return s ? `/admin/productos?${s}` : "/admin/productos";
+  };
   const nombreCat = (id: string | null) =>
     id ? categorias.find((c) => c.id === id)?.nombre ?? "—" : "Sin categoría";
 
@@ -30,8 +45,8 @@ export default async function ProductosAdminPage({
           <h1 className="m-0 text-2xl font-extrabold tracking-[-.02em] text-ink">Productos</h1>
           <p className="m-0 text-sm text-muted-2">
             {q
-              ? `${productos.length} resultado${productos.length === 1 ? "" : "s"} para “${q}”`
-              : `${productos.length} en total`}
+              ? `${total} resultado${total === 1 ? "" : "s"} para “${q}”`
+              : `${total} en total`}
           </p>
         </div>
         <Link
@@ -45,6 +60,7 @@ export default async function ProductosAdminPage({
       {/* Barra de búsqueda (formulario GET → ?q=) */}
       <form action="/admin/productos" className="mb-4 flex items-center gap-2.5 border border-line rounded-[10px] px-3.5 py-2.5 bg-white max-w-[440px]">
         <SearchIcon size={17} className="text-muted-2 shrink-0" />
+        {estado && <input type="hidden" name="estado" value={estado} />}
         <input
           name="q"
           defaultValue={q}
@@ -53,16 +69,37 @@ export default async function ProductosAdminPage({
           className="border-0 outline-none w-full text-[15px] bg-transparent text-body"
         />
         {q && (
-          <Link href="/admin/productos" className="text-xs font-semibold text-muted-2 shrink-0">
+          <Link href={estado ? `/admin/productos?estado=${estado}` : "/admin/productos"} className="text-xs font-semibold text-muted-2 shrink-0">
             Limpiar
           </Link>
         )}
       </form>
 
+      {/* Filtro por visibilidad */}
+      <div className="mb-4 flex gap-2">
+        {([
+          [undefined, "Todos"],
+          ["visibles", "Visibles"],
+          ["ocultos", "Ocultos"],
+        ] as const).map(([valor, texto]) => (
+          <Link
+            key={texto}
+            href={url({ estado: valor })}
+            className={`text-sm font-semibold px-3.5 py-1.5 rounded-full border ${
+              estado === valor ? "bg-brand text-white border-brand" : "bg-white text-[#4a5158] border-line"
+            }`}
+          >
+            {texto}
+          </Link>
+        ))}
+      </div>
+
       {productos.length === 0 ? (
         <div className="border border-line rounded-xl bg-white p-10 text-center text-muted">
           {q
             ? `No se encontraron productos para “${q}”.`
+            : estado
+            ? `No hay productos ${estado}.`
             : "No hay productos todavía. Crea el primero con “Nuevo producto”."}
         </div>
       ) : (
@@ -122,6 +159,28 @@ export default async function ProductosAdminPage({
             </div>
           ))}
         </div>
+      )}
+
+      {paginas > 1 && (
+        <nav aria-label="Páginas" className="mt-5 flex items-center justify-center gap-4 text-sm">
+          {pagina > 1 ? (
+            <Link href={url({ pagina: pagina - 1 })} className="font-semibold text-brand hover:underline">
+              ← Anterior
+            </Link>
+          ) : (
+            <span className="text-muted-2">← Anterior</span>
+          )}
+          <span className="text-muted-2 tnum">
+            Página {pagina} de {paginas}
+          </span>
+          {pagina < paginas ? (
+            <Link href={url({ pagina: pagina + 1 })} className="font-semibold text-brand hover:underline">
+              Siguiente →
+            </Link>
+          ) : (
+            <span className="text-muted-2">Siguiente →</span>
+          )}
+        </nav>
       )}
     </div>
   );
