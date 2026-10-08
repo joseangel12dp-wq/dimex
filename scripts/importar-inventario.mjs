@@ -80,7 +80,7 @@ const filas = datos
     codigo: (f[iCod] ?? "").trim() || null,
     nombre: (f[iDesc] ?? "").trim().replace(/\s+/g, " "),
     unidad: (f[iUni] ?? "").trim() || null,
-    existencia: Number(String(f[iExi] ?? "0").replace(",", ".")) || 0,
+    existencia: Math.max(0, Number(String(f[iExi] ?? "0").replace(",", ".")) || 0), // negativos → 0
   }))
   .filter((x) => x.nombre);
 // Sin código no se importa: el dueño los verifica primero.
