@@ -3,6 +3,7 @@ import { getProductosAdminPagina, getCategoriasAdmin } from "@/lib/admin-queries
 import { getSessionProfile } from "@/lib/auth";
 import { money } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
+import MediaImagen from "@/components/MediaImagen";
 import { SearchIcon } from "@/components/icons";
 import { alternarActivoProducto, eliminarProducto } from "./actions";
 
@@ -109,7 +110,14 @@ export default async function ProductosAdminPage({
               key={p.id}
               className="flex items-center gap-3 border border-line rounded-xl bg-white p-3"
             >
-              <div className="w-12 h-12 rounded-lg shrink-0 bg-surface [background-image:repeating-linear-gradient(45deg,#eaedf0_0_7px,#f4f6f8_7px_14px)]" />
+              {/* Miniatura de la portada (sin foto → rayado gris) */}
+              <Link
+                href={`/admin/productos/${p.id}`}
+                aria-label={`Editar ${p.nombre}`}
+                className="relative w-16 h-16 rounded-lg shrink-0 overflow-hidden border border-line bg-white"
+              >
+                <MediaImagen src={p.imagen_url} alt={p.nombre} label="Sin foto" sizes="64px" />
+              </Link>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-[15px] truncate">{p.nombre}</div>
                 <div className="text-xs text-muted-2 flex items-center gap-2 flex-wrap">
