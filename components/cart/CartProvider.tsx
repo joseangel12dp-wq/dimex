@@ -64,7 +64,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setState((s) => {
       const items = s.items.slice();
       const i = items.findIndex((l) => l.id === item.id);
-      if (i >= 0) items[i] = { ...items[i], qty: items[i].qty + 1 };
+      if (i >= 0)
+        items[i] = { ...items[i], qty: items[i].qty + 1, image: items[i].image ?? item.image };
       else items.push({ ...item, qty: 1 });
       return { ...s, items };
     });

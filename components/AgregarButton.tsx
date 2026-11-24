@@ -11,16 +11,18 @@ export default function AgregarButton({
   id,
   name,
   price,
+  image,
 }: {
   id: string;
   name: string;
   price: number;
+  image?: string | null;
 }) {
   const { add } = useCart();
   return (
     <button
       type="button"
-      onClick={() => add({ id, name, price })}
+      onClick={() => add({ id, name, price, image })}
       aria-label={`Agregar ${name} al carrito`}
       title="Agregar al carrito"
       className="w-11 h-11 border-0 bg-brand text-white rounded-[10px] flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90"

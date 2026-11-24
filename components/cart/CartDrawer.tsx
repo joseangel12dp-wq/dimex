@@ -6,6 +6,7 @@ import { useSiteConfig } from "@/components/ConfigProvider";
 import { money } from "@/lib/format";
 import { buildOrderMessage, waLink } from "@/lib/whatsapp";
 import { CartIcon, WhatsAppIcon } from "@/components/icons";
+import MediaImagen from "@/components/MediaImagen";
 
 /** Panel lateral del carrito, controlado por el contexto (useCart). */
 export default function CartDrawer() {
@@ -133,7 +134,9 @@ export default function CartDrawer() {
             <div className="noscroll flex-1 overflow-y-auto px-[22px] py-1">
               {items.map((l) => (
                 <div key={l.id} className="flex gap-3.5 py-[18px] border-b border-[#f0f2f4]">
-                  <div className="w-16 h-16 rounded-[10px] shrink-0 bg-surface [background-image:repeating-linear-gradient(45deg,#eaedf0_0_8px,#f4f6f8_8px_16px)]" />
+                  <div className="relative w-16 h-16 rounded-[10px] shrink-0 overflow-hidden bg-surface">
+                    <MediaImagen src={l.image ?? null} alt={l.name} label=" " sizes="64px" />
+                  </div>
                   <div className="flex-1 flex flex-col gap-1.5">
                     <div className="flex justify-between gap-2.5">
                       <span className="text-[15px] font-semibold leading-[1.25]">{l.name}</span>

@@ -4,7 +4,14 @@
  * a recargas y cierres del navegador, sin necesidad de cuenta (§8).
  */
 
-export type CartLine = { id: string; name: string; price: number; qty: number };
+export type CartLine = {
+  id: string;
+  name: string;
+  price: number;
+  qty: number;
+  /** Foto del producto o kit (opcional; los carritos viejos no la tienen). */
+  image?: string | null;
+};
 export type Fulfillment = "pickup" | "delivery";
 export type CartState = {
   items: CartLine[];

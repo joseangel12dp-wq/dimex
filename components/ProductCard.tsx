@@ -66,7 +66,7 @@ export default function ProductCard({
         )}
 
         <div className="flex gap-2 mt-2">
-          <AgregarButton id={p.id} name={p.nombre} price={p.precio} />
+          <AgregarButton id={p.id} name={p.nombre} price={p.precio} image={p.imagen_url} />
           <a
             href={waLink(`Hola DIMEX, me interesa: ${p.nombre}`)}
             target="_blank"

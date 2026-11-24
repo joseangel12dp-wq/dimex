@@ -106,6 +106,7 @@ export default async function KitDetallePage({
                 id={kit.id}
                 name={kit.nombre}
                 price={kit.precio}
+                image={kit.imagen_url}
                 className="flex-1 min-w-[180px] bg-brand text-white rounded-[11px] py-[15px] text-[15px] font-bold cursor-pointer"
               >
                 Agregar al carrito
@@ -136,6 +137,7 @@ export default async function KitDetallePage({
           id={kit.id}
           name={kit.nombre}
           price={kit.precio}
+          image={kit.imagen_url}
           className="flex-1 max-w-[220px] h-[52px] bg-brand text-white rounded-xl text-base font-bold cursor-pointer"
         >
           Agregar

@@ -11,18 +11,20 @@ export default function AgregarKitButton({
   id,
   name,
   price,
+  image,
   className,
   children,
 }: {
   id: string;
   name: string;
   price: number;
+  image?: string | null;
   className?: string;
   children: React.ReactNode;
 }) {
   const { add } = useCart();
   return (
-    <button type="button" onClick={() => add({ id, name, price })} className={className}>
+    <button type="button" onClick={() => add({ id, name, price, image })} className={className}>
       {children}
     </button>
   );
